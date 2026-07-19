@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Hồ Sơ Chi Bộ</title>
-    <!-- Nhúng file kết nối -->
+    <title>Hệ Thống Quản Lý Hồ Sơ Chi Bộ</title>
+    <!-- Nhúng thư viện xác thực bảo mật của Google -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- File cấu hình tĩnh chứa App_Config -->
     <script src="ketnoi.js"></script>
+    
     <style>
-        /* CSS HỆ THỐNG - Đảm bảo văn phong hành chính, chuẩn mực */
+        /* CSS HỆ THỐNG - Đảm bảo văn phong trang nghiêm, hành chính */
         :root {
-            --primary-color: #c92a2a; /* Đỏ cờ Đảng */
+            --primary-color: #c92a2a; 
             --bg-color: #f4f6f9;
             --text-color: #333;
             --border-color: #ddd;
@@ -30,10 +33,10 @@
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             position: relative;
             overflow: hidden;
-            animation: fadeIn 0.6s ease-out; /* Hiệu ứng hiện trang */
+            animation: fadeIn 0.6s ease-out; 
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
@@ -41,44 +44,46 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .header img {
-            width: 60px;
-            margin-bottom: 10px;
+            width: 65px;
+            margin-bottom: 12px;
         }
         .header h2 {
             margin: 0;
             font-size: 20px;
             text-transform: uppercase;
+            font-weight: bold;
         }
         .header h3 {
-            margin: 5px 0 0;
+            margin: 6px 0 0;
             font-size: 16px;
             color: var(--primary-color);
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
         label {
             display: block;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
-        input[type="text"], input[type="password"], select, textarea {
+        input[type="text"], select, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
             box-sizing: border-box;
             font-family: inherit;
+            font-size: 15px;
             transition: border-color 0.3s;
         }
         input:focus, select:focus, textarea:focus {
             border-color: var(--primary-color);
             outline: none;
         }
-        button {
+        button.btn-primary {
             width: 100%;
             padding: 12px;
             background-color: var(--primary-color);
@@ -89,19 +94,26 @@
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s, transform 0.1s;
+            margin-top: 10px;
         }
-        button:hover {
+        button.btn-primary:hover {
             background-color: #a02020;
         }
-        button:active {
+        button.btn-primary:active {
             transform: scale(0.98);
         }
         
-        /* Hiệu ứng Loader mô phỏng chuẩn ReactBits */
+        .google-btn-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        /* Hiệu ứng Loader mô phỏng ReactBits */
         .overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.92);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -110,8 +122,8 @@
             display: none;
         }
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid var(--primary-color);
             border-radius: 50%;
@@ -121,133 +133,172 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
         .hidden { display: none !important; }
-        .error-msg { color: var(--primary-color); font-size: 14px; text-align: center; margin-top: 10px; }
+        .error-msg { color: var(--primary-color); font-size: 14px; text-align: center; margin-top: 15px; font-weight: bold;}
     </style>
 </head>
 <body>
 
-    <!-- KHU VỰC 1: ĐĂNG NHẬP (Quản lý quyền truy cập) -->
+    <!-- KHU VỰC 1: XÁC THỰC BẢO MẬT -->
     <div class="container" id="khuVucDangNhap">
         <div class="header">
             <img id="logo-don-vi" src="" alt="Logo">
             <h2 id="ten-don-vi">TÊN ĐƠN VỊ</h2>
             <h3 id="ten-phan-mem">TÊN PHẦN MỀM</h3>
+            <p style="font-size: 14px; color: #666; margin-top: 15px; font-style: italic;">
+                Vui lòng xác thực bằng Account được cấp quyền
+            </p>
         </div>
-        <div class="form-group">
-            <label>Tài khoản (Account):</label>
-            <input type="text" id="inputAccount" placeholder="Nhập tài khoản quản lý">
+        
+        <div class="google-btn-wrapper">
+            <div id="nutDangNhapGoogle"></div>
         </div>
-        <div class="form-group">
-            <label>Mật mã:</label>
-            <input type="password" id="inputMatKhau" placeholder="Nhập mã bảo mật">
-        </div>
-        <button onclick="xacThucHeThong()">ĐĂNG NHẬP</button>
+        
         <div id="loiDangNhap" class="error-msg"></div>
     </div>
 
     <!-- KHU VỰC 2: GIAO DIỆN LẬP HỒ SƠ -->
     <div class="container hidden" id="khuVucChinh">
-        <div class="header">
+        <div class="header" style="margin-bottom: 15px;">
             <h2>LẬP HỒ SƠ TỰ ĐỘNG</h2>
-            <p id="hienThiAccount" style="font-style: italic; font-size: 14px; margin-top: 5px;"></p>
+            <p id="hienThiAccount" style="font-style: italic; font-size: 14px; margin-top: 8px; color: #555;"></p>
         </div>
         
         <div class="form-group">
-            <label>Mẫu văn bản:</label>
+            <label>1. Chọn mẫu văn bản:</label>
             <select id="loaiVanBan">
                 <option value="03">Mẫu 03 - Quyết định kiểm tra chấp hành</option>
                 <option value="04">Mẫu 04 - Kế hoạch kiểm tra chấp hành</option>
                 <option value="08">Mẫu 08 - Quyết định giám sát chuyên đề</option>
-                <!-- Bạn có thể thêm các mẫu từ 01 đến 37 vào đây -->
+                <option value="09">Mẫu 09 - Kế hoạch giám sát chuyên đề</option>
+                <option value="13">Mẫu 13 - Quyết định kiểm tra khi có dấu hiệu vi phạm</option>
             </select>
         </div>
         
         <div class="form-group">
-            <label>Đối tượng kiểm tra/giám sát:</label>
-            <input type="text" id="doiTuong" placeholder="Vd: Đồng chí Nguyễn Văn A, chức vụ...">
+            <label>2. Đối tượng kiểm tra/giám sát:</label>
+            <input type="text" id="doiTuong" placeholder="Vd: Đồng chí Nguyễn Văn A, Bí thư Chi bộ...">
         </div>
         
         <div class="form-group">
-            <label>Thời gian tiến hành:</label>
-            <input type="text" id="thoiGian" placeholder="Vd: Từ ngày... đến ngày...">
+            <label>3. Thời gian tiến hành:</label>
+            <input type="text" id="thoiGian" placeholder="Vd: Từ ngày 01/08/2026 đến ngày 15/08/2026">
         </div>
         
         <div class="form-group">
-            <label>Nội dung kiểm tra/giám sát:</label>
-            <textarea id="noiDung" rows="4" placeholder="Nhập tóm tắt nội dung..."></textarea>
+            <label>4. Nội dung kiểm tra/giám sát:</label>
+            <textarea id="noiDung" rows="3" placeholder="Nhập tóm tắt nội dung để hệ thống đưa vào biểu mẫu..."></textarea>
         </div>
         
-        <button onclick="guiLenhTaoHoSo()">TIẾN HÀNH TẠO HỒ SƠ</button>
+        <button class="btn-primary" onclick="guiLenhTaoHoSo()">TIẾN HÀNH TẠO HỒ SƠ</button>
         
-        <!-- Hiệu ứng tải dữ liệu -->
+        <!-- Màn hình chờ trong lúc kết nối API -->
         <div class="overlay" id="manHinhCho">
             <div class="spinner"></div>
-            <strong style="color: var(--primary-color)">Hệ thống đang trích xuất văn bản...</strong>
+            <strong style="color: var(--primary-color); font-size: 16px;">Hệ thống đang trích xuất văn bản...</strong>
         </div>
     </div>
 
     <!-- KHU VỰC 3: TRẢ KẾT QUẢ -->
     <div class="container hidden" id="khuVucKetQua">
         <div class="header">
-            <h2 style="color: green;">HOÀN THÀNH!</h2>
-            <p>Hồ sơ đã được thiết lập thành công.</p>
+            <h2 style="color: #2b8a3e;">HOÀN THÀNH!</h2>
+            <p style="font-size: 15px; margin-top: 10px;">Văn bản hành chính đã được thiết lập thành công.</p>
         </div>
-        <div style="text-align: center; margin-top: 20px;">
+        <div style="text-align: center; margin-top: 25px;">
             <a id="linkTaiLieu" href="#" target="_blank" style="text-decoration: none;">
-                <button style="background-color: #2b8a3e;">MỞ TÀI LIỆU (GOOGLE DOCS)</button>
+                <button class="btn-primary" style="background-color: #2b8a3e;">MỞ TÀI LIỆU (GOOGLE DOCS)</button>
             </a>
         </div>
-        <div style="text-align: center; margin-top: 15px;">
-            <a href="#" onclick="taiLaiTrang()" style="color: var(--text-color);">Quay lại trang tạo mới</a>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="#" onclick="taiLaiTrang()" style="color: var(--primary-color); font-weight: bold; text-decoration: none;">
+                &laquo; Tạo hồ sơ mới
+            </a>
         </div>
     </div>
 
-    <!-- KHỐI LỆNH JAVASCRIPT XỬ LÝ -->
+    <!-- KHỐI LỆNH JAVASCRIPT XỬ LÝ NGHIỆP VỤ -->
     <script>
+        // Cấu trúc biến toàn cục lưu trữ phiên làm việc
         let currentAccount = "";
+        let currentIdMau = ""; 
+        let currentIdThuMucLuu = "";
 
-        // Nạp cấu hình từ ketnoi.js khi trang vừa tải
+        // Khởi tạo thông số giao diện và thư viện Google Identity
         window.onload = function() {
             document.getElementById("logo-don-vi").src = APP_CONFIG.LOGO_URL;
             document.getElementById("ten-don-vi").innerText = APP_CONFIG.TEN_DON_VI;
             document.getElementById("ten-phan-mem").innerText = APP_CONFIG.PHAN_MEM;
+
+            google.accounts.id.initialize({
+                client_id: APP_CONFIG.CLIENT_ID,
+                callback: xuLyDangNhapThanhCong
+            });
+            google.accounts.id.renderButton(
+                document.getElementById("nutDangNhapGoogle"),
+                { theme: "outline", size: "large", width: 250 }
+            );
         };
 
-        // Hàm xử lý xác thực
-        function xacThucHeThong() {
-            const acc = document.getElementById("inputAccount").value.trim();
-            const pass = document.getElementById("inputMatKhau").value.trim();
-            
-            // Đối chiếu với danh sách Account trong ketnoi.js
-            const validAccount = APP_CONFIG.DANH_SACH_ACCOUNT.find(
-                item => item.accountID === acc && item.matKhau === pass
-            );
+        // Hàm xử lý dữ liệu sau khi nhận chứng chỉ JWT
+        function xuLyDangNhapThanhCong(response) {
+            try {
+                // Giải mã Base64Url
+                const base64Url = response.credential.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                
+                const thongTin = JSON.parse(jsonPayload);
+                // Truy xuất định danh Account từ Payload
+                const accountID = thongTin['email']; 
 
-            if (validAccount) {
-                currentAccount = validAccount.accountID;
-                document.getElementById("khuVucDangNhap").classList.add("hidden");
-                document.getElementById("khuVucChinh").classList.remove("hidden");
-                document.getElementById("hienThiAccount").innerText = "Phiên làm việc: " + currentAccount + " (" + validAccount.vaiTro + ")";
-            } else {
-                document.getElementById("loiDangNhap").innerText = "Tài khoản hoặc mã bảo mật không chính xác!";
+                // Quét Ma trận phân quyền động từ APP_CONFIG
+                const quyenHan = APP_CONFIG.PHAN_QUYEN_TAI_KHOAN[accountID];
+                
+                if (quyenHan) {
+                    currentAccount = accountID;
+                    currentIdMau = quyenHan.ID_MAU; 
+                    currentIdThuMucLuu = quyenHan.ID_THU_MUC_LUU;
+                    
+                    document.getElementById("khuVucDangNhap").classList.add("hidden");
+                    document.getElementById("khuVucChinh").classList.remove("hidden");
+                    document.getElementById("hienThiAccount").innerText = "Tài khoản thực hiện: " + currentAccount;
+                } else {
+                    document.getElementById("loiDangNhap").innerText = "Lỗi: Account của bạn không có quyền truy cập hệ thống!";
+                }
+            } catch (error) {
+                document.getElementById("loiDangNhap").innerText = "Lỗi giải mã dữ liệu xác thực hệ thống.";
             }
         }
 
-        // Hàm đóng gói dữ liệu và gọi API GAS
+        // Hàm thu thập form, đóng gói và gọi API
         function guiLenhTaoHoSo() {
-            // Lấy dữ liệu
+            // Kiểm tra trường dữ liệu trống
+            const loaiVanBan = document.getElementById("loaiVanBan").value;
+            const doiTuong = document.getElementById("doiTuong").value.trim();
+            const thoiGian = document.getElementById("thoiGian").value.trim();
+            const noiDung = document.getElementById("noiDung").value.trim();
+
+            if(!doiTuong || !thoiGian || !noiDung) {
+                alert("Vui lòng điền đầy đủ các thông tin trước khi tiến hành tạo hồ sơ.");
+                return;
+            }
+
             const duLieu = {
                 account: currentAccount,
-                loaiVanBan: document.getElementById("loaiVanBan").value,
-                doiTuong: document.getElementById("doiTuong").value,
-                thoiGian: document.getElementById("thoiGian").value,
-                noiDung: document.getElementById("noiDung").value
+                idMau: currentIdMau,             
+                idThuMucLuu: currentIdThuMucLuu, 
+                loaiVanBan: loaiVanBan,
+                doiTuong: doiTuong,
+                thoiGian: thoiGian,
+                noiDung: noiDung
             };
 
-            // Bật màn hình chờ loading (Hiệu ứng reactbits)
+            // Bật màn hình Loading
             document.getElementById("manHinhCho").style.display = "flex";
 
-            // Gửi dữ liệu qua fetch API POST
+            // Gọi API bằng Fetch
             fetch(APP_CONFIG.API_URL, {
                 method: "POST",
                 headers: {
@@ -263,20 +314,21 @@
                     document.getElementById("khuVucKetQua").classList.remove("hidden");
                     document.getElementById("linkTaiLieu").href = data.url;
                 } else {
-                    alert(data.message);
+                    alert("Cảnh báo từ hệ thống: " + data.message);
                 }
             })
             .catch(error => {
                 document.getElementById("manHinhCho").style.display = "none";
-                alert("Lỗi kết nối đến máy chủ. Vui lòng kiểm tra lại đường dẫn API.");
-                console.error(error);
+                alert("Lỗi kết nối đến máy chủ. Vui lòng thử lại hoặc liên hệ Quản trị viên.");
             });
         }
 
-        // Hàm reset giao diện
+        // Hàm đặt lại trạng thái biểu mẫu ban đầu
         function taiLaiTrang() {
             document.getElementById("khuVucKetQua").classList.add("hidden");
             document.getElementById("khuVucChinh").classList.remove("hidden");
+            
+            // Xóa rỗng các trường nhập liệu
             document.getElementById("doiTuong").value = "";
             document.getElementById("thoiGian").value = "";
             document.getElementById("noiDung").value = "";
