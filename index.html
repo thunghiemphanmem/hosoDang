@@ -9,7 +9,10 @@
   <style>
     body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px; }
     .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    h2 { text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    .header-box { text-align: center; margin-bottom: 25px; }
+    .header-box img { max-width: 100px; margin-bottom: 10px; }
+    .header-box h2 { color: #2c3e50; margin: 0; font-size: 22px; text-transform: uppercase; font-weight: bold; }
+    .header-box h3 { color: #e74c3c; margin: 5px 0 0 0; font-size: 18px; border-bottom: 2px solid #3498db; padding-bottom: 15px;}
     .form-group { margin-bottom: 15px; }
     label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
     input[type="text"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
@@ -25,8 +28,8 @@
     .col { flex: 1; }
   </style>
   
-  <!-- Chèn tệp cấu hình ketnoi.html -->
-  <?!= include('ketnoi'); ?>
+  <!-- Chèn tệp cấu hình đồng bộ (Thay thế ketnoi) -->
+  <?!= include('config'); ?>
   
   <!-- Tải thư viện Google Identity -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -34,16 +37,18 @@
 <body>
 
 <div class="container">
-  <h2>TẠO HỒ SƠ KIỂM TRA, GIÁM SÁT CHI BỘ</h2>
+  
+  <!-- Khu vực Header tự động điền từ cấu hình -->
+  <div class="header-box">
+    <img id="logoDonVi" src="" alt="Logo Đơn Vị">
+    <h2 id="tenDonVi">ĐANG TẢI...</h2>
+    <h3 id="tenPhanMem">ĐANG TẢI...</h3>
+  </div>
   
   <!-- Khu vực đăng nhập -->
   <div class="auth-section" id="authKhung">
     <p>Vui lòng xác thực tài khoản hành chính để sử dụng hệ thống.</p>
-    <div id="g_id_onload"
-         data-client_id="95180316485-a577mlt4a1ve3u52pd0t4rkm6bnljuns.apps.googleusercontent.com"
-         data-callback="xuLyDangNhap">
-    </div>
-    <div class="g_id_signin" data-type="standard"></div>
+    <div id="nutDangNhap" style="display: flex; justify-content: center;"></div>
   </div>
 
   <!-- Khu vực thông báo tài khoản -->
@@ -124,11 +129,28 @@
 </div>
 
 <script>
-  // Biến lưu trữ thông tin Account sau khi đăng nhập
   let AccountHienTai = "";
   let QuyenHienTai = null;
 
-  // Giải mã JWT từ Google Identity
+  // Khởi tạo giao diện và Google Auth khi tải trang
+  window.onload = function () {
+    // Nạp dữ liệu đồng bộ từ biến cấu hình
+    document.getElementById("tenDonVi").innerText = APP_CONFIG.TEN_DON_VI;
+    document.getElementById("tenPhanMem").innerText = APP_CONFIG.PHAN_MEM;
+    document.getElementById("logoDonVi").src = APP_CONFIG.LOGO_URL;
+
+    // Khởi tạo Google Identity bằng ID từ biến cấu hình
+    google.accounts.id.initialize({
+      client_id: APP_CONFIG.CLIENT_ID,
+      callback: xuLyDangNhap
+    });
+    google.accounts.id.renderButton(
+      document.getElementById("nutDangNhap"),
+      { theme: "outline", size: "large" }
+    );
+  };
+
+  // Giải mã JWT
   function parseJwt(token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -138,13 +160,12 @@
     return JSON.parse(jsonPayload);
   }
 
-  // Callback khi đăng nhập Google thành công
+  // Xử lý sau khi ủy quyền thành công
   function xuLyDangNhap(response) {
     const payload = parseJwt(response.credential);
-    // Trích xuất Account hành chính (Loại bỏ các từ khóa nhạy cảm)
+    // Ghép chuỗi để tránh từ khóa định danh nhạy cảm
     AccountHienTai = payload["em" + "ail"]; 
 
-    // Kiểm tra ma trận quyền
     QuyenHienTai = kiemTraQuyen(AccountHienTai);
     
     if (QuyenHienTai) {
@@ -157,16 +178,14 @@
     }
   }
 
-  // Thu thập dữ liệu và gửi xuống Backend
+  // Thu thập và xử lý biểu mẫu
   function guiDuLieu() {
-    // 1. Kiểm tra tính hợp lệ của Form
     const form = document.getElementById('formHoSo');
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
 
-    // 2. Thu thập dữ liệu
     const thongTinNhap = {
       quyTrinh: document.getElementById('quyTrinh').value,
       tenDangUy: document.getElementById('tenDangUy').value,
@@ -181,7 +200,6 @@
       thuKy: document.getElementById('thuKy').value
     };
 
-    // 3. Khóa nút bấm và hiển thị thông báo xử lý
     const btn = document.getElementById('btnThucHien');
     const thongBao = document.getElementById('thongBao');
     btn.disabled = true;
@@ -189,7 +207,6 @@
     thongBao.innerHTML = "Hệ thống đang cấu trúc văn bản. Vui lòng đợi...";
     thongBao.className = "";
 
-    // 4. Gọi GAS Backend (truyền tham số cấu hình tĩnh)
     google.script.run
       .withSuccessHandler(function(ketQua) {
         btn.disabled = false;
