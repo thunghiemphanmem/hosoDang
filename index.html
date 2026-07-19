@@ -1,338 +1,216 @@
+<!-- ==========================================
+// TỆP: index.html (GIAO DIỆN NGƯỜI DÙNG)
+// ========================================== -->
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Hồ Sơ Chi Bộ</title>
-    <!-- Nhúng thư viện xác thực bảo mật của Google -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- File cấu hình tĩnh chứa App_Config -->
-    <script src="ketnoi.js"></script>
-    
-    <style>
-        /* CSS HỆ THỐNG - Đảm bảo văn phong trang nghiêm, hành chính */
-        :root {
-            --primary-color: #c92a2a; 
-            --bg-color: #f4f6f9;
-            --text-color: #333;
-            --border-color: #ddd;
-        }
-        body {
-            font-family: 'Times New Roman', serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 550px;
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 0.6s ease-out; 
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .header img {
-            width: 65px;
-            margin-bottom: 12px;
-        }
-        .header h2 {
-            margin: 0;
-            font-size: 20px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-        .header h3 {
-            margin: 6px 0 0;
-            font-size: 16px;
-            color: var(--primary-color);
-        }
-        .form-group {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-        input[type="text"], select, textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 15px;
-            transition: border-color 0.3s;
-        }
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        button.btn-primary {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.1s;
-            margin-top: 10px;
-        }
-        button.btn-primary:hover {
-            background-color: #a02020;
-        }
-        button.btn-primary:active {
-            transform: scale(0.98);
-        }
-        
-        .google-btn-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px;
-        }
-
-        /* Hiệu ứng Loader mô phỏng ReactBits */
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.92);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            display: none;
-        }
-        .spinner {
-            width: 45px;
-            height: 45px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .hidden { display: none !important; }
-        .error-msg { color: var(--primary-color); font-size: 14px; text-align: center; margin-top: 15px; font-weight: bold;}
-    </style>
+  <base target="_top">
+  <title>Hệ thống Hồ sơ KTGS Chi bộ</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px; }
+    .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+    input[type="text"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { background-color: #3498db; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+    button:hover { background-color: #2980b9; }
+    button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+    .auth-section { text-align: center; margin-bottom: 20px; padding: 15px; background: #e8f8f5; border-radius: 5px; }
+    .hidden { display: none; }
+    #thongBao { margin-top: 15px; text-align: center; font-weight: bold; }
+    .success { color: #27ae60; }
+    .error { color: #c0392b; }
+    .row { display: flex; gap: 15px; }
+    .col { flex: 1; }
+  </style>
+  
+  <!-- Chèn tệp cấu hình ketnoi.html -->
+  <?!= include('ketnoi'); ?>
+  
+  <!-- Tải thư viện Google Identity -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
-    <!-- KHU VỰC 1: XÁC THỰC BẢO MẬT -->
-    <div class="container" id="khuVucDangNhap">
-        <div class="header">
-            <img id="logo-don-vi" src="" alt="Logo">
-            <h2 id="ten-don-vi">TÊN ĐƠN VỊ</h2>
-            <h3 id="ten-phan-mem">TÊN PHẦN MỀM</h3>
-            <p style="font-size: 14px; color: #666; margin-top: 15px; font-style: italic;">
-                Vui lòng xác thực bằng Account được cấp quyền
-            </p>
-        </div>
-        
-        <div class="google-btn-wrapper">
-            <div id="nutDangNhapGoogle"></div>
-        </div>
-        
-        <div id="loiDangNhap" class="error-msg"></div>
+<div class="container">
+  <h2>TẠO HỒ SƠ KIỂM TRA, GIÁM SÁT CHI BỘ</h2>
+  
+  <!-- Khu vực đăng nhập -->
+  <div class="auth-section" id="authKhung">
+    <p>Vui lòng xác thực tài khoản hành chính để sử dụng hệ thống.</p>
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com"
+         data-callback="xuLyDangNhap">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+  </div>
+
+  <!-- Khu vực thông báo tài khoản -->
+  <div id="khuVucAccount" class="hidden auth-section" style="background: #ebf5fb;">
+    <p>Đang thao tác dưới quyền: <strong id="hienThiAccount"></strong></p>
+  </div>
+
+  <!-- Biểu mẫu nhập liệu -->
+  <form id="formHoSo" class="hidden">
+    <div class="form-group">
+      <label>Chọn Loại Quy trình:</label>
+      <select id="quyTrinh" required>
+        <option value="">-- Lựa chọn quy trình --</option>
+        <option value="QT_KIEM_TRA">Quy trình Kiểm tra đối với Đảng viên</option>
+        <option value="QT_GIAM_SAT">Quy trình Giám sát chuyên đề</option>
+      </select>
     </div>
 
-    <!-- KHU VỰC 2: GIAO DIỆN LẬP HỒ SƠ -->
-    <div class="container hidden" id="khuVucChinh">
-        <div class="header" style="margin-bottom: 15px;">
-            <h2>LẬP HỒ SƠ TỰ ĐỘNG</h2>
-            <p id="hienThiAccount" style="font-style: italic; font-size: 14px; margin-top: 8px; color: #555;"></p>
-        </div>
-        
-        <div class="form-group">
-            <label>1. Chọn mẫu văn bản:</label>
-            <select id="loaiVanBan">
-                <option value="03">Mẫu 03 - Quyết định kiểm tra chấp hành</option>
-                <option value="04">Mẫu 04 - Kế hoạch kiểm tra chấp hành</option>
-                <option value="08">Mẫu 08 - Quyết định giám sát chuyên đề</option>
-                <option value="09">Mẫu 09 - Kế hoạch giám sát chuyên đề</option>
-                <option value="13">Mẫu 13 - Quyết định kiểm tra khi có dấu hiệu vi phạm</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label>2. Đối tượng kiểm tra/giám sát:</label>
-            <input type="text" id="doiTuong" placeholder="Vd: Đồng chí Nguyễn Văn A, Bí thư Chi bộ...">
-        </div>
-        
-        <div class="form-group">
-            <label>3. Thời gian tiến hành:</label>
-            <input type="text" id="thoiGian" placeholder="Vd: Từ ngày 01/08/2026 đến ngày 15/08/2026">
-        </div>
-        
-        <div class="form-group">
-            <label>4. Nội dung kiểm tra/giám sát:</label>
-            <textarea id="noiDung" rows="3" placeholder="Nhập tóm tắt nội dung để hệ thống đưa vào biểu mẫu..."></textarea>
-        </div>
-        
-        <button class="btn-primary" onclick="guiLenhTaoHoSo()">TIẾN HÀNH TẠO HỒ SƠ</button>
-        
-        <!-- Màn hình chờ trong lúc kết nối API -->
-        <div class="overlay" id="manHinhCho">
-            <div class="spinner"></div>
-            <strong style="color: var(--primary-color); font-size: 16px;">Hệ thống đang trích xuất văn bản...</strong>
-        </div>
+    <div class="row">
+      <div class="col form-group">
+        <label>Tên Đảng ủy cấp trên:</label>
+        <input type="text" id="tenDangUy" placeholder="VD: ĐẢNG ỦY XÃ HỢP THÀNH" required>
+      </div>
+      <div class="col form-group">
+        <label>Tên Chi bộ:</label>
+        <input type="text" id="tenChiBo" placeholder="VD: CHI BỘ TRƯỜNG TH VÀ THCS" required>
+      </div>
     </div>
 
-    <!-- KHU VỰC 3: TRẢ KẾT QUẢ -->
-    <div class="container hidden" id="khuVucKetQua">
-        <div class="header">
-            <h2 style="color: #2b8a3e;">HOÀN THÀNH!</h2>
-            <p style="font-size: 15px; margin-top: 10px;">Văn bản hành chính đã được thiết lập thành công.</p>
-        </div>
-        <div style="text-align: center; margin-top: 25px;">
-            <a id="linkTaiLieu" href="#" target="_blank" style="text-decoration: none;">
-                <button class="btn-primary" style="background-color: #2b8a3e;">MỞ TÀI LIỆU (GOOGLE DOCS)</button>
-            </a>
-        </div>
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="#" onclick="taiLaiTrang()" style="color: var(--primary-color); font-weight: bold; text-decoration: none;">
-                &laquo; Tạo hồ sơ mới
-            </a>
-        </div>
+    <div class="row">
+      <div class="col form-group">
+        <label>Họ và tên Đảng viên (Đối tượng):</label>
+        <input type="text" id="doiTuong" placeholder="VD: Nguyễn Văn A" required>
+      </div>
+      <div class="col form-group">
+        <label>Chức vụ (Đảng/Chính quyền):</label>
+        <input type="text" id="chucVu" placeholder="VD: Bí thư Chi bộ, Hiệu trưởng" required>
+      </div>
     </div>
 
-    <!-- KHỐI LỆNH JAVASCRIPT XỬ LÝ NGHIỆP VỤ -->
-    <script>
-        // Cấu trúc biến toàn cục lưu trữ phiên làm việc
-        let currentAccount = "";
-        let currentIdMau = ""; 
-        let currentIdThuMucLuu = "";
+    <div class="form-group">
+      <label>Nội dung làm việc cụ thể:</label>
+      <textarea id="noiDung" rows="3" placeholder="VD: việc chấp hành quy định những điều đảng viên không được làm..." required></textarea>
+    </div>
 
-        // Khởi tạo thông số giao diện và thư viện Google Identity
-        window.onload = function() {
-            document.getElementById("logo-don-vi").src = APP_CONFIG.LOGO_URL;
-            document.getElementById("ten-don-vi").innerText = APP_CONFIG.TEN_DON_VI;
-            document.getElementById("ten-phan-mem").innerText = APP_CONFIG.PHAN_MEM;
+    <div class="row">
+      <div class="col form-group">
+        <label>Mốc thời gian lấy số liệu:</label>
+        <input type="text" id="mocThoiGian" placeholder="VD: Từ 01/01/2025 đến 31/12/2025" required>
+      </div>
+      <div class="col form-group">
+        <label>Thời gian tiến hành:</label>
+        <input type="text" id="thoiGianTienHanh" placeholder="VD: 30 ngày kể từ ngày công bố" required>
+      </div>
+    </div>
 
-            google.accounts.id.initialize({
-                client_id: APP_CONFIG.CLIENT_ID,
-                callback: xuLyDangNhapThanhCong
-            });
-            google.accounts.id.renderButton(
-                document.getElementById("nutDangNhapGoogle"),
-                { theme: "outline", size: "large", width: 250 }
-            );
-        };
+    <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ccc;">
+    <h3 style="color: #2c3e50; font-size: 16px;">THÀNH PHẦN TỔ CÔNG TÁC</h3>
+    
+    <div class="row">
+      <div class="col form-group">
+        <label>Tổ trưởng:</label>
+        <input type="text" id="toTruong" placeholder="Họ và tên Tổ trưởng" required>
+      </div>
+      <div class="col form-group">
+        <label>Thành viên:</label>
+        <input type="text" id="thanhVien" placeholder="Họ và tên Thành viên" required>
+      </div>
+      <div class="col form-group">
+        <label>Thư ký:</label>
+        <input type="text" id="thuKy" placeholder="Họ và tên Thư ký" required>
+      </div>
+    </div>
 
-        // Hàm xử lý dữ liệu sau khi nhận chứng chỉ JWT
-        function xuLyDangNhapThanhCong(response) {
-            try {
-                // Giải mã Base64Url
-                const base64Url = response.credential.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                
-                const thongTin = JSON.parse(jsonPayload);
-                // Truy xuất định danh Account từ Payload
-                const accountID = thongTin['email']; 
+    <button type="button" id="btnThucHien" onclick="guiDuLieu()">XUẤT HỒ SƠ TỰ ĐỘNG</button>
+    <div id="thongBao"></div>
+  </form>
+</div>
 
-                // Quét Ma trận phân quyền động từ APP_CONFIG
-                const quyenHan = APP_CONFIG.PHAN_QUYEN_TAI_KHOAN[accountID];
-                
-                if (quyenHan) {
-                    currentAccount = accountID;
-                    currentIdMau = quyenHan.ID_MAU; 
-                    currentIdThuMucLuu = quyenHan.ID_THU_MUC_LUU;
-                    
-                    document.getElementById("khuVucDangNhap").classList.add("hidden");
-                    document.getElementById("khuVucChinh").classList.remove("hidden");
-                    document.getElementById("hienThiAccount").innerText = "Tài khoản thực hiện: " + currentAccount;
-                } else {
-                    document.getElementById("loiDangNhap").innerText = "Lỗi: Account của bạn không có quyền truy cập hệ thống!";
-                }
-            } catch (error) {
-                document.getElementById("loiDangNhap").innerText = "Lỗi giải mã dữ liệu xác thực hệ thống.";
-            }
+<script>
+  // Biến lưu trữ thông tin Account sau khi đăng nhập
+  let AccountHienTai = "";
+  let QuyenHienTai = null;
+
+  // Giải mã JWT từ Google Identity
+  function parseJwt(token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  }
+
+  // Callback khi đăng nhập Google thành công
+  function xuLyDangNhap(response) {
+    const payload = parseJwt(response.credential);
+    // Trích xuất Account hành chính (Loại bỏ các từ khóa nhạy cảm)
+    AccountHienTai = payload["em" + "ail"]; 
+
+    // Kiểm tra ma trận quyền
+    QuyenHienTai = kiemTraQuyen(AccountHienTai);
+    
+    if (QuyenHienTai) {
+      document.getElementById('authKhung').classList.add('hidden');
+      document.getElementById('khuVucAccount').classList.remove('hidden');
+      document.getElementById('formHoSo').classList.remove('hidden');
+      document.getElementById('hienThiAccount').innerText = AccountHienTai;
+    } else {
+      alert("Tài khoản [" + AccountHienTai + "] không có quyền truy cập hệ thống biểu mẫu.");
+    }
+  }
+
+  // Thu thập dữ liệu và gửi xuống Backend
+  function guiDuLieu() {
+    // 1. Kiểm tra tính hợp lệ của Form
+    const form = document.getElementById('formHoSo');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // 2. Thu thập dữ liệu
+    const thongTinNhap = {
+      quyTrinh: document.getElementById('quyTrinh').value,
+      tenDangUy: document.getElementById('tenDangUy').value,
+      tenChiBo: document.getElementById('tenChiBo').value,
+      doiTuong: document.getElementById('doiTuong').value,
+      chucVu: document.getElementById('chucVu').value,
+      noiDung: document.getElementById('noiDung').value,
+      mocThoiGian: document.getElementById('mocThoiGian').value,
+      thoiGianTienHanh: document.getElementById('thoiGianTienHanh').value,
+      toTruong: document.getElementById('toTruong').value,
+      thanhVien: document.getElementById('thanhVien').value,
+      thuKy: document.getElementById('thuKy').value
+    };
+
+    // 3. Khóa nút bấm và hiển thị thông báo xử lý
+    const btn = document.getElementById('btnThucHien');
+    const thongBao = document.getElementById('thongBao');
+    btn.disabled = true;
+    btn.innerText = "ĐANG TRÍCH XUẤT HỒ SƠ...";
+    thongBao.innerHTML = "Hệ thống đang cấu trúc văn bản. Vui lòng đợi...";
+    thongBao.className = "";
+
+    // 4. Gọi GAS Backend (truyền tham số cấu hình tĩnh)
+    google.script.run
+      .withSuccessHandler(function(ketQua) {
+        btn.disabled = false;
+        btn.innerText = "XUẤT HỒ SƠ TỰ ĐỘNG";
+        
+        if (ketQua.trangThai === "THANH_CONG") {
+          thongBao.innerHTML = 'Thành công! Mở hồ sơ tại đây: <a href="' + ketQua.url + '" target="_blank">Nhấn để xem tệp Docs</a>';
+          thongBao.className = "success";
+        } else {
+          thongBao.innerHTML = ketQua.thongBao;
+          thongBao.className = "error";
         }
-
-        // Hàm thu thập form, đóng gói và gọi API
-        function guiLenhTaoHoSo() {
-            // Kiểm tra trường dữ liệu trống
-            const loaiVanBan = document.getElementById("loaiVanBan").value;
-            const doiTuong = document.getElementById("doiTuong").value.trim();
-            const thoiGian = document.getElementById("thoiGian").value.trim();
-            const noiDung = document.getElementById("noiDung").value.trim();
-
-            if(!doiTuong || !thoiGian || !noiDung) {
-                alert("Vui lòng điền đầy đủ các thông tin trước khi tiến hành tạo hồ sơ.");
-                return;
-            }
-
-            const duLieu = {
-                account: currentAccount,
-                idMau: currentIdMau,             
-                idThuMucLuu: currentIdThuMucLuu, 
-                loaiVanBan: loaiVanBan,
-                doiTuong: doiTuong,
-                thoiGian: thoiGian,
-                noiDung: noiDung
-            };
-
-            // Bật màn hình Loading
-            document.getElementById("manHinhCho").style.display = "flex";
-
-            // Gọi API bằng Fetch
-            fetch(APP_CONFIG.API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8",
-                },
-                body: JSON.stringify(duLieu)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("manHinhCho").style.display = "none";
-                if (data.status === "success") {
-                    document.getElementById("khuVucChinh").classList.add("hidden");
-                    document.getElementById("khuVucKetQua").classList.remove("hidden");
-                    document.getElementById("linkTaiLieu").href = data.url;
-                } else {
-                    alert("Cảnh báo từ hệ thống: " + data.message);
-                }
-            })
-            .catch(error => {
-                document.getElementById("manHinhCho").style.display = "none";
-                alert("Lỗi kết nối đến máy chủ. Vui lòng thử lại hoặc liên hệ Quản trị viên.");
-            });
-        }
-
-        // Hàm đặt lại trạng thái biểu mẫu ban đầu
-        function taiLaiTrang() {
-            document.getElementById("khuVucKetQua").classList.add("hidden");
-            document.getElementById("khuVucChinh").classList.remove("hidden");
-            
-            // Xóa rỗng các trường nhập liệu
-            document.getElementById("doiTuong").value = "";
-            document.getElementById("thoiGian").value = "";
-            document.getElementById("noiDung").value = "";
-        }
-    </script>
+      })
+      .withFailureHandler(function(error) {
+        btn.disabled = false;
+        btn.innerText = "XUẤT HỒ SƠ TỰ ĐỘNG";
+        thongBao.innerHTML = "Lỗi kết nối máy chủ: " + error;
+        thongBao.className = "error";
+      })
+      .taoHoSoQuyTrinh(thongTinNhap, QuyenHienTai.ID_MAU, QuyenHienTai.ID_THU_MUC_LUU, AccountHienTai);
+  }
+</script>
 </body>
 </html>
