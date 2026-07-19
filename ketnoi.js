@@ -1,17 +1,26 @@
 const APP_CONFIG = {
-    // URL của Web App sau khi Deploy từ Google Apps Script
+    // 1. URL CỦA WEB APP
     API_URL: "https://script.google.com/macros/s/AKfycbw1KJcuCwckBZPqtp00LvSR_8kbG_nD8we-vOhn7xCmt0fgLCSnPBob88vOjoIrZmn1gQ/exec",
     
-    // Thông tin hiển thị của đơn vị
+    // 2. THÔNG TIN GIAO DIỆN
     TEN_DON_VI: "TRƯỜNG TH VÀ THCS HỢP THÀNH",
     PHAN_MEM: "HỆ THỐNG QUẢN LÝ HỒ SƠ CHI BỘ",
-    
-    // Link logo
     LOGO_URL: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Logo_Đảng_Cộng_sản_Việt_Nam.svg/200px-Logo_Đảng_Cộng_sản_Việt_Nam.svg.png",
     
-    // Quản lý truy cập: Tuyệt đối không dùng biến thu thập thông tin cá nhân.
-    DANH_SACH_ACCOUNT: [
-        { accountID: "admin", matKhau: "123456", vaiTro: "Quản trị viên" },
-        { accountID: "canbo01", matKhau: "123456", vaiTro: "Cán bộ kiểm tra" }
-    ]
+    // 3. XÁC THỰC BẢO MẬT GIAO THỨC GOOGLE
+    CLIENT_ID: '95180316485-a577mlt4a1ve3u52pd0t4rkm6bnljuns.apps.googleusercontent.com',
+    
+    // 4. MA TRẬN PHÂN QUYỀN ĐỘNG SỔ HỌP
+    // Hệ thống tự động trỏ ID_MAU và ID_THU_MUC_LUU theo Account đăng nhập
+    PHAN_QUYEN_TAI_KHOAN: {
+        'hoangngoclamlc@gmail.com': {
+            ID_MAU: '1UqCA0XHewvkDhWcn-tF4DoizdGPVEZ_uR_rD91ORIGk',
+            ID_THU_MUC_LUU: '1ZMwNvtDHfyRP73CWEDMh8xfQ-mGZ2e6h'
+        },
+        'tulieuhopthanh@gmail.com': {
+            ID_MAU: '1UqCA0XHewvkDhWcn-tF4DoizdGPVEZ_uR_rD91ORIGk', 
+            ID_THU_MUC_LUU: '1ZMwNvtDHfyRP73CWEDMh8xfQ-mGZ2e6h' 
+        }
+        // Có thể bổ sung thêm Account quản lý tại đây theo đúng cấu trúc trên
+    }
 };
