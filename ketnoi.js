@@ -5,7 +5,7 @@ const APP_CONFIG = {
     // 2. THÔNG TIN GIAO DIỆN
     TEN_DON_VI: "TRƯỜNG TH VÀ THCS HỢP THÀNH",
     PHAN_MEM: "HỆ THỐNG QUẢN LÝ HỒ SƠ CHI BỘ",
-    LOGO_URL: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Logo_Đảng_Cộng_sản_Việt_Nam.svg/200px-Logo_Đảng_Cộng_sản_Việt_Nam.svg.png",
+    LOGO_URL: "https://i.ibb.co/d0JNW94Z/logo-l-a-ch-n6.png",
     
     // 3. XÁC THỰC BẢO MẬT GIAO THỨC GOOGLE
     CLIENT_ID: '95180316485-a577mlt4a1ve3u52pd0t4rkm6bnljuns.apps.googleusercontent.com',
